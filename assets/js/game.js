@@ -28,8 +28,9 @@ let highScore = localStorage.getItem("highScore") || 0;
 document.getElementById("highScore").innerText = highScore;
 
 let level = 1;
+document.getElementById("level").innerText = level;
 
-// ✅ VIDAS (CORRECTO)
+// VIDAS
 let lives = 3;
 document.getElementById("lives").innerText = lives;
 
@@ -50,12 +51,12 @@ function initBricks() {
 
 initBricks();
 
-// ✅ BOTÓN START
+// BOTÓN START
 document.getElementById("startBtn").addEventListener("click", () => {
   gameStarted = true;
 });
 
-// ✅ CONTROL CON MOUSE
+// CONTROL CON MOUSE
 canvas.addEventListener("mousemove", function (e) {
   const rect = canvas.getBoundingClientRect();
   const mouseX = e.clientX - rect.left;
@@ -87,7 +88,18 @@ function collisionDetection() {
             document.getElementById("highScore").innerText = highScore;
           }
 
-          function checkLevelComplete() {
+          // VERIFICAR SI TERMINÓ EL NIVEL
+          if (checkLevelComplete()) {
+            nextLevel();
+          }
+        }
+      }
+    }
+  }
+}
+
+// VERIFICAR NIVEL COMPLETO (CORRECTO)
+function checkLevelComplete() {
   for (let c = 0; c < brickColumnCount; c++) {
     for (let r = 0; r < brickRowCount; r++) {
       if (bricks[c][r].status === 1) {
@@ -97,32 +109,31 @@ function collisionDetection() {
   }
   return true;
 }
-        }
-      }
-    }
-  }
-}
-
-function checkLevelComplete() {
-  return bricks.flat().every(b => b.status === 0);
-}
 
 // SIGUIENTE NIVEL
 function nextLevel() {
   if (level < 10) {
     level++;
+
     document.getElementById("level").innerText = level;
     document.getElementById("message").innerText = "🎉 ¡Felicidades! Nivel superado";
 
+    // Aumentar dificultad
     dx += 0.5;
-    dy -= 0.5;
+    dy = -(Math.abs(dy) + 0.5);
     brickRowCount++;
 
+    // Reiniciar pelota
+    x = canvas.width / 2;
+    y = canvas.height - 60;
+
+    // Reiniciar bloques
     initBricks();
 
     setTimeout(() => {
       document.getElementById("message").innerText = "";
     }, 2000);
+
   } else {
     document.getElementById("message").innerText = "🏆 ¡Ganaste la Copa del Mundo!";
     gameStarted = false;
@@ -135,7 +146,13 @@ function drawBall() {
 }
 
 function drawPaddle() {
-  ctx.drawImage(messiImg, paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+  ctx.drawImage(
+    messiImg,
+    paddleX,
+    canvas.height - paddleHeight,
+    paddleWidth,
+    paddleHeight
+  );
 }
 
 function drawBricks() {
@@ -154,7 +171,7 @@ function drawBricks() {
   }
 }
 
-// LOOP
+// LOOP PRINCIPAL
 function draw() {
   if (!gameStarted) {
     requestAnimationFrame(draw);
@@ -172,7 +189,7 @@ function draw() {
   if (x + dx > canvas.width || x + dx < 0) dx = -dx;
   if (y + dy < 0) dy = -dy;
 
-  // ✅ COLISIÓN CON MESSI
+  // COLISIÓN CON MESSI
   if (
     y + dy > canvas.height - paddleHeight &&
     x > paddleX &&
@@ -184,7 +201,7 @@ function draw() {
     dx = hitPoint * 0.1;
   }
 
-  // ✅ PIERDE VIDA
+  // PIERDE VIDA
   else if (y + dy > canvas.height) {
     lives--;
     document.getElementById("lives").innerText = lives;
@@ -195,7 +212,7 @@ function draw() {
       return;
     }
 
-    // reiniciar pelota
+    // Reiniciar pelota
     x = canvas.width / 2;
     y = canvas.height - 60;
     dx = 3;
