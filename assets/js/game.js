@@ -47,15 +47,17 @@ function initBricks() {
 
 initBricks();
 
-// CONTROLES
-document.addEventListener("keydown", e => {
-  if (e.key === "Right") rightPressed = true;
-  if (e.key === "Left") leftPressed = true;
-});
+canvas.addEventListener("mousemove", function (e) {
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left;
 
-document.addEventListener("keyup", e => {
-  if (e.key === "Right") rightPressed = false;
-  if (e.key === "Left") leftPressed = false;
+  paddleX = mouseX - paddleWidth / 2;
+
+  // Limitar dentro del canvas
+  if (paddleX < 0) paddleX = 0;
+  if (paddleX > canvas.width - paddleWidth) {
+    paddleX = canvas.width - paddleWidth;
+  }
 });
 
 // COLISIONES
