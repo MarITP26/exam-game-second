@@ -17,3 +17,18 @@ canvas {
   font-weight: bold;
   color: yellow;
 }
+
+canvas {
+  cursor: url('../assets/messi-cursor.png'), auto;
+}
+
+#startBtn {
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 10px;
+}
+
+#lives {
+  color: red;
+  font-weight: bold;
+}

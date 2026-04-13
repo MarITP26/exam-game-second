@@ -6,12 +6,14 @@ canvas.height = 500;
 
 // IMÁGENES
 const ballImg = new Image();
-ballImg.src = "./assets/img/balon_fut.png" ;
+ballImg.src = "./assets/img/balon_fut.png";
 
 const messiImg = new Image();
 messiImg.src = "./assets/img/messi_arg.png";
 
 // VARIABLES
+let gameStarted = false;
+
 let x = canvas.width / 2;
 let y = canvas.height - 60;
 let dx = 3;
@@ -21,14 +23,15 @@ let paddleWidth = 100;
 let paddleHeight = 20;
 let paddleX = canvas.width / 2 - paddleWidth / 2;
 
-let rightPressed = false;
-let leftPressed = false;
-
 let score = 0;
 let highScore = localStorage.getItem("highScore") || 0;
 document.getElementById("highScore").innerText = highScore;
 
 let level = 1;
+
+// ✅ VIDAS (CORRECTO)
+let lives = 3;
+document.getElementById("lives").innerText = lives;
 
 // BLOQUES
 let brickRowCount = 3;
@@ -47,20 +50,25 @@ function initBricks() {
 
 initBricks();
 
+// ✅ BOTÓN START
+document.getElementById("startBtn").addEventListener("click", () => {
+  gameStarted = true;
+});
+
+// ✅ CONTROL CON MOUSE
 canvas.addEventListener("mousemove", function (e) {
   const rect = canvas.getBoundingClientRect();
   const mouseX = e.clientX - rect.left;
 
   paddleX = mouseX - paddleWidth / 2;
 
-  // Limitar dentro del canvas
   if (paddleX < 0) paddleX = 0;
   if (paddleX > canvas.width - paddleWidth) {
     paddleX = canvas.width - paddleWidth;
   }
 });
 
-// COLISIONES
+// COLISIONES CON BLOQUES
 function collisionDetection() {
   for (let c = 0; c < brickColumnCount; c++) {
     for (let r = 0; r < brickRowCount; r++) {
@@ -79,7 +87,16 @@ function collisionDetection() {
             document.getElementById("highScore").innerText = highScore;
           }
 
-          if (checkLevelComplete()) nextLevel();
+          function checkLevelComplete() {
+  for (let c = 0; c < brickColumnCount; c++) {
+    for (let r = 0; r < brickRowCount; r++) {
+      if (bricks[c][r].status === 1) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
         }
       }
     }
@@ -108,6 +125,7 @@ function nextLevel() {
     }, 2000);
   } else {
     document.getElementById("message").innerText = "🏆 ¡Ganaste la Copa del Mundo!";
+    gameStarted = false;
   }
 }
 
@@ -138,6 +156,11 @@ function drawBricks() {
 
 // LOOP
 function draw() {
+  if (!gameStarted) {
+    requestAnimationFrame(draw);
+    return;
+  }
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   drawBricks();
@@ -145,20 +168,42 @@ function draw() {
   drawPaddle();
   collisionDetection();
 
-  // REBOTES
+  // REBOTES PAREDES
   if (x + dx > canvas.width || x + dx < 0) dx = -dx;
   if (y + dy < 0) dy = -dy;
 
-  // GAME OVER
-  if (y + dy > canvas.height) {
-    document.location.reload();
+  // ✅ COLISIÓN CON MESSI
+  if (
+    y + dy > canvas.height - paddleHeight &&
+    x > paddleX &&
+    x < paddleX + paddleWidth
+  ) {
+    dy = -dy;
+
+    let hitPoint = x - (paddleX + paddleWidth / 2);
+    dx = hitPoint * 0.1;
+  }
+
+  // ✅ PIERDE VIDA
+  else if (y + dy > canvas.height) {
+    lives--;
+    document.getElementById("lives").innerText = lives;
+
+    if (lives <= 0) {
+      document.getElementById("message").innerText = "💀 Game Over";
+      gameStarted = false;
+      return;
+    }
+
+    // reiniciar pelota
+    x = canvas.width / 2;
+    y = canvas.height - 60;
+    dx = 3;
+    dy = -3;
   }
 
   x += dx;
   y += dy;
-
-  if (rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 6;
-  if (leftPressed && paddleX > 0) paddleX -= 6;
 
   requestAnimationFrame(draw);
 }
