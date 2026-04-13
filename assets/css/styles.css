@@ -1,0 +1,19 @@
+body {
+  background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+  color: white;
+}
+
+canvas {
+  background-image: url('https://populous.com/uploads/2022/10/GettyImages-1245700394-Do-not-use-after-31MAR2025-1200x675-c-center.jpg');
+  background-size: cover;
+  border: 3px solid white;
+  border-radius: 10px;
+  display: block;
+  margin: auto;
+}
+
+#message {
+  font-size: 20px;
+  font-weight: bold;
+  color: yellow;
+}
