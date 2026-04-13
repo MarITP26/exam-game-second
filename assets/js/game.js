@@ -6,10 +6,10 @@ canvas.height = 500;
 
 // IMÁGENES
 const ballImg = new Image();
-ballImg.src = "./assets/img/ball.jpeg" ;
+ballImg.src = "./assets/img/balon_fut.png" ;
 
 const messiImg = new Image();
-messiImg.src = "./assets/img/messi.jpeg";
+messiImg.src = "./assets/img/messi_arg.png";
 
 // VARIABLES
 let x = canvas.width / 2;
